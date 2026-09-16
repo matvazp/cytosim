@@ -38,21 +38,23 @@ app/              stlite (Streamlit-in-browser) app — to come
 
 ## Setup (Windows, PowerShell)
 
-The venv lives outside the project (`C:\Users\<you>\venvs\cytosim`): the project
-path is long enough that a `.venv` inside it hits the Windows 260-character path
-limit during `pip install`, and it keeps the venv out of OneDrive sync.
+Clone to a short path outside OneDrive (e.g. `C:\Users\<you>\dev\cytosim`).
+Long paths hit the Windows 260-character limit during `pip install`, and
+OneDrive sync and `.git` don't mix well.
 
 ```powershell
-python -m venv $env:USERPROFILE\venvs\cytosim
-& $env:USERPROFILE\venvs\cytosim\Scripts\Activate.ps1
+git clone https://github.com/matvazp/cytosim.git $env:USERPROFILE\dev\cytosim
+cd $env:USERPROFILE\dev\cytosim
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
 pip install -e ".[dev]"
 python -m ipykernel install --user --name cytosim --display-name "Python (cytosim)"
 pytest
 ```
 
 Open `notebooks/01 simple model.ipynb` in VS Code and select the
-`Python (cytosim)` kernel. `.vscode/settings.json` already points the workspace
-at this interpreter.
+`Python (cytosim)` kernel. `.vscode/settings.json` points the workspace at
+`.venv`.
 
 ## Usage
 
