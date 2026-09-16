@@ -39,9 +39,23 @@ area, particle size, ...). Sharing via SharePoint is desirable, not required.
   event rate/coincidence (`MILK_PARTICLES` concentrations are stored for it).
 
 ## Next steps (in order)
-1. Agree the sampling criterion; add event rate / coincidence.
-2. Detector geometry + photon budget.
-3. stlite app in `app/` on top of `simulate()`, with an SVG/JS animated
+1. **Real velocity field in the square duct** (replaces the plug/parabolic
+   switch, factor 2 on the answer): laminar rectangular-duct series solution
+   (centreline/mean ≈ 2.10 for a square); core size/shape from mass
+   conservation with that profile; velocity *distribution* across the core →
+   pulse-width distribution; `f_s_required` from the fastest particle; report
+   plug flow as the lower bound because Re ≈ 2500 is transitional. Test: predicted
+   core width lands in the measured 10–30 µm without a tunable profile flag.
+   Open questions for the user: is the core circular or a ribbon (thin across
+   the laser, tall along it)? Is detection fluorescence (EB = DNA stain, so
+   bacteria/somatic cells) with fat globules only as scatter/background?
+2. **Event rate / coincidence** from `MILK_PARTICLES`: ~5e6 fat globules/s
+   (~5 in the beam at any instant → continuous background), bacteria up to
+   ~5e4/s, somatic cells ~1e4/s. Likely reframes the sampling criterion as
+   "resolve two bacteria ~1 µs apart" rather than "10 samples per FWHM".
+3. Agree the sampling criterion with signal processing.
+4. Detector geometry + photon budget.
+5. stlite app in `app/` on top of `simulate()`, with an SVG/JS animated
    channel view; deploy via CI to GitHub Pages.
 
 ## CI (GitHub Actions, `.github/workflows/ci.yml`)
