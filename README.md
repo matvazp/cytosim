@@ -1,8 +1,24 @@
 # cytosim — ADC sample-rate model for a milk flow cytometer channel
 
+[![CI](https://github.com/matvazp/cytosim/actions/workflows/ci.yml/badge.svg)](https://github.com/matvazp/cytosim/actions/workflows/ci.yml)
+
 Estimates the ADC sampling rate needed to digitise the detector pulses of a
 hydrodynamically focused flow cytometer channel, as a function of channel
 geometry, flow rates, laser spot size and particle size.
+
+## Status
+
+**v0.1 — first-pass physics, numbers not yet reviewed.** The package runs and
+is tested, but the sampling criterion (10 samples per pulse FWHM, 5× Nyquist
+oversampling) is a placeholder to be agreed with signal processing, and the
+model does not yet include detector optics, noise or event rate. Current
+headline with instrument defaults: ~0.7 µs pulse FWHM for a 1 µm particle,
+**~14 MHz** required sample rate. See *Model assumptions* below before quoting.
+
+Roadmap:
+1. Agree the sampling criterion; add event rate / coincidence from milk particle concentrations.
+2. Detector collection geometry and photon budget (laser power, wavelength are already in `Params`).
+3. Browser app (stlite) with an animated channel view, shareable by link.
 
 ## Layout
 
