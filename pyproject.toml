@@ -1,0 +1,29 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "cytosim"
+version = "0.1.0"
+description = "Flow cytometer channel model to estimate the ADC sampling rate required for milk analysis"
+readme = "README.md"
+requires-python = ">=3.11"
+# Keep this list Pyodide-compatible (pure Python / NumPy / SciPy only):
+# the package must run in the browser via stlite (Route B).
+dependencies = [
+    "numpy>=1.26",
+    "scipy>=1.11",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8",
+    "ipykernel",   # VS Code notebook kernel; full `jupyter` hits Windows MAX_PATH under this OneDrive path
+    "matplotlib",
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

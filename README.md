@@ -1,0 +1,76 @@
+# cytosim — ADC sample-rate model for a milk flow cytometer channel
+
+Estimates the ADC sampling rate needed to digitise the detector pulses of a
+hydrodynamically focused flow cytometer channel, as a function of channel
+geometry, flow rates, laser spot size and particle size.
+
+## Layout
+
+```
+src/cytosim/      physics package (pure NumPy/SciPy — runs in Pyodide/stlite)
+  params.py       Params dataclass: every user-adjustable input, SI units
+  geometry.py     cross-section, hydraulic diameter, focused core size
+  flow.py         velocity, Reynolds number
+  optics.py       Gaussian laser spot
+  particle.py     transit, detector pulse shape (top-hat ⊗ Gaussian)
+  signal.py       pulse width/bandwidth → sample-rate criteria
+  model.py        simulate(Params) -> Results
+tests/            pytest
+notebooks/        exploration / derivation notebooks
+app/              stlite (Streamlit-in-browser) app — to come
+```
+
+## Setup (Windows, PowerShell)
+
+The venv lives outside the project (`C:\Users\<you>\venvs\cytosim`): the project
+path is long enough that a `.venv` inside it hits the Windows 260-character path
+limit during `pip install`, and it keeps the venv out of OneDrive sync.
+
+```powershell
+python -m venv $env:USERPROFILE\venvs\cytosim
+& $env:USERPROFILE\venvs\cytosim\Scripts\Activate.ps1
+pip install -e ".[dev]"
+python -m ipykernel install --user --name cytosim --display-name "Python (cytosim)"
+pytest
+```
+
+Open `notebooks/01 simple model.ipynb` in VS Code and select the
+`Python (cytosim)` kernel. `.vscode/settings.json` already points the workspace
+at this interpreter.
+
+## Usage
+
+```python
+from cytosim import Params, simulate, units
+
+r = simulate(Params(q_sheath=units.ul_per_min(800), particle_diameter=units.um(10)))
+print(r.f_s_required)   # Hz
+```
+
+## Units
+
+`Params` fields are stored in SI. Type lengths as `um(...)` and flow rates as
+`ul_per_s(...)` / `ml_per_min(...)` / `ul_per_min(...)`; a bare number is metres
+or m³/s and will silently give nonsense.
+
+## Instrument defaults
+
+Taken from the current real-life instrument: 200 × 200 µm channel; sheath
+20 mL/min at ~1.5 bar and ~37 °C; sample 10 µL/s diluted 1:1 with EB
+(`Params.eb()`, default) or 7 µL/s diluted 1:3.2 with PR2 (`Params.pr2()`);
+oval 450 nm spot 20 µm (along flow) × 100 µm, >40 mW. The observed focused
+core width of 10–30 µm is used as a validation target (`tests/`), and milk
+particle populations are listed in `params.MILK_PARTICLES`.
+
+## Model assumptions (v0.1)
+
+- Rectangular channel; core area = channel area × (Q_sample / Q_total) / (v_core / v_mean).
+  Default `velocity_profile="parabolic"` (v_core = 2 v_mean) reproduces the
+  measured core width; `"plug"` overestimates it.
+- Gaussian laser spot along the flow direction (1/e² diameter = `spot_height`).
+- Particle modelled as a uniformly emitting top-hat of diameter `particle_diameter`;
+  pulse = top-hat convolved with the Gaussian beam.
+- Sample rate = max(`samples_per_fwhm` / FWHM, `oversampling` × 2 × f_3dB).
+- Not yet modelled: detector aperture/collection optics, laser power / photon
+  budget, noise, event rate and coincidence (particle concentrations are
+  stored for this), transitional-flow effects (the instrument runs at Re ≈ 2500).
