@@ -80,11 +80,19 @@ oval 450 nm spot 20 µm (along flow) × 100 µm, >40 mW. The observed focused
 core width of 10–30 µm is used as a validation target (`tests/`), and milk
 particle populations are listed in `params.MILK_PARTICLES`.
 
-## Model assumptions (v0.1)
+## Model assumptions (v0.2)
 
-- Rectangular channel; core area = channel area × (Q_sample / Q_total) / (v_core / v_mean).
-  Default `velocity_profile="parabolic"` (v_core = 2 v_mean) reproduces the
-  measured core width; `"plug"` overestimates it.
+- Fully developed laminar flow in the rectangular duct (`flow.RectangularDuct`,
+  series solution; centreline = 2.096 × mean for a square). The sample core is
+  sized by mass conservation with that field (`geometry.core_size`): flow
+  through the core = Q_sample. This reproduces the measured 10–30 µm core
+  width with no tunable profile parameter; plug flow (38 µm) does not.
+- Core cross-section: ellipse, circular by default (`core_aspect = 1`);
+  `core_aspect > 1` gives a ribbon thin across the laser beam and tall along it.
+- Particles across the core see velocities from the core edge to the axis
+  (~1.5 % spread for the default core); the sampling rate follows from the
+  fastest particle. Plug flow is reported alongside as the lower bound since
+  the instrument runs at Re ≈ 2500 (transitional).
 - Gaussian laser spot along the flow direction (1/e² diameter = `spot_height`).
 - Particle modelled as a uniformly emitting top-hat of diameter `particle_diameter`;
   pulse = top-hat convolved with the Gaussian beam.

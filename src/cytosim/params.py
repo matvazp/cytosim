@@ -51,10 +51,11 @@ class Params:
     density: float = 993.0                 # kg/m^3
     viscosity: float = 0.69e-3             # Pa.s
 
-    # Velocity profile seen by the core stream: "plug" (v_core = v_mean) or
-    # "parabolic" (v_core = 2 v_mean, fully developed laminar flow). The
-    # measured 10-30 µm core width is consistent with "parabolic" (see tests).
-    velocity_profile: str = "parabolic"
+    # Focused core cross-section: ellipse with aspect = extent along the laser
+    # beam (x) / extent across it (y). 1.0 = circular core; > 1 = ribbon that
+    # is thin across the beam and tall along it. Injector geometry unknown, so
+    # circular is assumed until measured.
+    core_aspect: float = 1.0
 
     # --- Laser spot (1/e^2 intensity diameters of the oval spot) ---
     spot_height: float = um(20.0)          # stored m; along the flow direction

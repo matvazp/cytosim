@@ -26,37 +26,40 @@ area, particle size, ...). Sharing via SharePoint is desirable, not required.
   subfolder holds project documentation not in git.
 - Git is at `C:\Program Files\Git\cmd` (may need adding to PATH in a shell).
 
-## Model state (v0.1)
+## Model state (v0.2)
 - Instrument defaults: 200×200 µm channel; sheath 20 mL/min ~37 °C; sample
   10 µL/s 1:1 EB (`Params.eb()`) or 7 µL/s 1:3.2 PR2 (`Params.pr2()`);
   450 nm oval spot 20 (along flow) × 100 µm, >40 mW.
-- Findings: Re ≈ 2500 (transitional); parabolic profile (core at 2× mean,
-  ~17 m/s) reproduces the measured 10–30 µm core width, plug flow does not;
-  1 µm particle → ~0.7 µs pulse FWHM → **~14 MHz** with the placeholder
-  criterion (10 samples/FWHM, 5× Nyquist oversampling). Do not quote until
-  the criterion is agreed with signal processing.
+- Velocity field: laminar rectangular-duct series solution
+  (`flow.RectangularDuct`, centreline/mean = 2.096 for the square). Core sized
+  by mass conservation with that field (`geometry.core_size`, elliptical core,
+  `Params.core_aspect`, circular by default — injector geometry still unknown).
+  `flow.PlugFlow` kept only as the transitional lower bound
+  (`Results.core_diameter_plug`, `Results.f_s_required_plug`).
+- Findings: Re ≈ 2500 (transitional); predicted core 26.7 µm (EB) / 22.4 µm
+  (PR2), inside the measured 10–30 µm with no tunable flag (plug: 38 / 32 µm).
+  The core sits on the flat top of the profile: velocity 17.7–18.0 m/s across
+  it, pulse-FWHM spread only ~1.5 %, so the fastest (centreline) particle sets
+  f_s. 1 µm particle → 655 ns FWHM → **~15 MHz** with the placeholder
+  criterion (10 samples/FWHM, 5× Nyquist); plug-flow bound ~7 MHz. Do not
+  quote until the criterion is agreed with signal processing.
+- Assumed (unconfirmed): detection is fluorescence from EB-stained bacteria /
+  somatic cells; fat globules are scatter/background only.
 - Not modelled yet: detector aperture/collection optics, photon budget, noise,
-  event rate/coincidence (`MILK_PARTICLES` concentrations are stored for it).
+  event rate/coincidence (`MILK_PARTICLES` concentrations are stored for it),
+  transitional-flow flattening of the profile (only bracketed by plug flow).
 
 ## Next steps (in order)
-1. **Real velocity field in the square duct** (replaces the plug/parabolic
-   switch, factor 2 on the answer): laminar rectangular-duct series solution
-   (centreline/mean ≈ 2.10 for a square); core size/shape from mass
-   conservation with that profile; velocity *distribution* across the core →
-   pulse-width distribution; `f_s_required` from the fastest particle; report
-   plug flow as the lower bound because Re ≈ 2500 is transitional. Test: predicted
-   core width lands in the measured 10–30 µm without a tunable profile flag.
-   Open questions for the user: is the core circular or a ribbon (thin across
-   the laser, tall along it)? Is detection fluorescence (EB = DNA stain, so
-   bacteria/somatic cells) with fat globules only as scatter/background?
-2. **Event rate / coincidence** from `MILK_PARTICLES`: ~5e6 fat globules/s
+1. **Event rate / coincidence** from `MILK_PARTICLES`: ~5e6 fat globules/s
    (~5 in the beam at any instant → continuous background), bacteria up to
    ~5e4/s, somatic cells ~1e4/s. Likely reframes the sampling criterion as
    "resolve two bacteria ~1 µs apart" rather than "10 samples per FWHM".
-3. Agree the sampling criterion with signal processing.
-4. Detector geometry + photon budget.
-5. stlite app in `app/` on top of `simulate()`, with an SVG/JS animated
+2. Agree the sampling criterion with signal processing.
+3. Detector geometry + photon budget.
+4. stlite app in `app/` on top of `simulate()`, with an SVG/JS animated
    channel view; deploy via CI to GitHub Pages.
+Still open for the user: core shape (circular vs ribbon → `core_aspect`) and
+confirmation that detection is fluorescence (EB = DNA stain).
 
 ## CI (GitHub Actions, `.github/workflows/ci.yml`)
 Runs pytest on 3.11/3.12 on every push/PR. The user asked to be **proactively
